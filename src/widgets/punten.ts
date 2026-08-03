@@ -23,12 +23,26 @@ const GOED_BEZIG_GRENS = 70;
 const UITSTEKEND_GRENS = 80;
 
 class PuntenWidget extends WidgetBase {
+  body: HTMLElement | null = null;
+
   override get category() {
     return "other";
   }
 
   override get name() {
     return "PuntenWidget";
+  }
+
+  override defaultSettings() {
+    return {
+      monochrome: false,
+    };
+  }
+
+  override async onSettingsChange() {
+    if (this.body) {
+      this.loadPunten(this.body);
+    }
   }
 
   async fetchEvaluaties(): Promise<Evaluation[]> {
@@ -101,8 +115,17 @@ class PuntenWidget extends WidgetBase {
 
     const body = document.createElement("div");
     body.classList.add("punten-body");
-    body.innerText = "Bezig met laden...";
     container.appendChild(body);
+    this.body = body;
+
+    this.loadPunten(body);
+
+    return container;
+  }
+
+  loadPunten(body: HTMLElement) {
+    body.innerText = "Bezig met laden...";
+    const monochrome = Boolean(this.settings.monochrome);
 
     this.fetchEvaluaties()
       .then((evaluaties) => {
@@ -123,7 +146,9 @@ class PuntenWidget extends WidgetBase {
         const overallValue = document.createElement("div");
         overallValue.classList.add("punten-overall-value");
         overallValue.innerText = `${overallAverage.toFixed(1)}%`;
-        overallValue.style.color = this.kleurVoorWaarde(overallAverage);
+        if (!monochrome) {
+          overallValue.style.color = this.kleurVoorWaarde(overallAverage);
+        }
         overallDiv.appendChild(overallValue);
 
         const overallMessage = document.createElement("div");
@@ -163,15 +188,19 @@ class PuntenWidget extends WidgetBase {
           bar.classList.add("punten-vak-bar");
           const clampedWidth = Math.max(0, Math.min(100, vak.average));
           bar.style.width = `${clampedWidth}%`;
-          const barKleur =
-            vak.average >= GOED_BEZIG_GRENS ? "#5cc951" : vak.average >= VOLDOENDE_GRENS ? "#ffd353" : "#e14448";
-          bar.style.setProperty("background-color", barKleur, "important");
+          if (!monochrome) {
+            const barKleur =
+              vak.average >= GOED_BEZIG_GRENS ? "#5cc951" : vak.average >= VOLDOENDE_GRENS ? "#ffd353" : "#e14448";
+            bar.style.setProperty("background-color", barKleur, "important");
+          }
           barContainer.appendChild(bar);
 
           const waarde = document.createElement("span");
           waarde.classList.add("punten-vak-value");
           waarde.innerText = `${vak.average.toFixed(1)}%`;
-          waarde.style.color = this.kleurVoorWaarde(vak.average);
+          if (!monochrome) {
+            waarde.style.color = this.kleurVoorWaarde(vak.average);
+          }
 
           row.append(naam, barContainer, waarde);
           list.appendChild(row);
@@ -187,8 +216,6 @@ class PuntenWidget extends WidgetBase {
         fout.innerText = "Kon je punten niet ophalen.";
         body.appendChild(fout);
       });
-
-    return container;
   }
 
   override async createPreview() {

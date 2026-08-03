@@ -1,6 +1,10 @@
 import { WidgetBase, registerWidget } from "./widgets.js";
 import { browser } from "../common/utils.js";
-import { searchButtonSvg, loadingSpinnerSvg } from "../fixes-utils/svgs.js";
+import {
+  searchButtonSvg,
+  loadingSpinnerSvg,
+  occupancyPersonSvg,
+} from "../fixes-utils/svgs.js";
 import { getExtensionImage } from "../common/utils.js";
 
 let stationSearchCache: any[] | null = null;
@@ -32,10 +36,6 @@ function formatDelay(delaySeconds: unknown, canceled: unknown): string {
   }
   const minutes = Math.round(delayValue / 60);
   return minutes === 0 ? "+1 min" : `+${minutes} min`;
-}
-
-function buildTicketPurchaseUrl(): string {
-  return "https://www.belgiantrain.be/en";
 }
 
 type StopInfo = {
@@ -98,6 +98,26 @@ function normalizeDepartureStops(departure: any): StopInfo[] {
     return departure.stop.map(normalizeStopData);
   }
   return [];
+}
+
+function trimStopsFromStation(
+  stops: StopInfo[],
+  originStationName: string | undefined
+): StopInfo[] {
+  if (!originStationName) {
+    return stops;
+  }
+  const origin = normalizeText(originStationName);
+  let originIndex = stops.findIndex(
+    (stop) => normalizeText(stop.station) === origin
+  );
+  if (originIndex === -1) {
+    originIndex = stops.findIndex((stop) => {
+      const station = normalizeText(stop.station);
+      return station.includes(origin) || origin.includes(station);
+    });
+  }
+  return originIndex > 0 ? stops.slice(originIndex) : stops;
 }
 
 function extractOccupancyText(rawOccupancy: any): string | null {
@@ -249,11 +269,16 @@ async function getStationList(): Promise<any[]> {
 
 type ExpandedCardTracker = { card: HTMLElement | null };
 
+// Delay tussen de kaart-animaties zodat ze na elkaar verschijnen, zoals bij
+// de De Lijn widget (daar ontstaat dit vanzelf door de API-calls per kaart).
+const CARD_APPEAR_STAGGER_MS = 75;
+
 async function createDepartureCard(
   departure: any,
   container: HTMLElement,
   expandedTracker: ExpandedCardTracker,
   originStationName: string | undefined,
+  cardIndex: number,
   signal?: AbortSignal
 ): Promise<void> {
   if (signal?.aborted) return;
@@ -272,9 +297,7 @@ async function createDepartureCard(
 
   const card = document.createElement("div");
   card.classList.add("trainCard");
-
-  const ticketUrl = buildTicketPurchaseUrl();
-  card.dataset["ticketUrl"] = ticketUrl;
+  card.style.animationDelay = `${cardIndex * CARD_APPEAR_STAGGER_MS}ms`;
 
   // Add delay status class for styling
   const canceledFlag =
@@ -339,25 +362,19 @@ async function createDepartureCard(
   if (occupancyInfo) {
     const occupancyBox = document.createElement("span");
     occupancyBox.classList.add("occupancy-box", occupancyInfo.className);
-    occupancyBox.textContent = occupancyInfo.label;
+    occupancyBox.title = occupancyInfo.label;
+    occupancyBox.innerHTML = occupancyPersonSvg.repeat(3);
     cardBottom.appendChild(occupancyBox);
   }
-
-  const buyTicketButton = document.createElement("button");
-  buyTicketButton.type = "button";
-  buyTicketButton.classList.add("buyTicketButton");
-  buyTicketButton.textContent = "Ticket";
-  buyTicketButton.addEventListener("click", (event: MouseEvent) => {
-    event.stopPropagation();
-    window.open(ticketUrl, "_blank", "noopener,noreferrer");
-  });
-  cardBottom.appendChild(buyTicketButton);
 
   // optional route preview (dropdown-style stop list)
   const routePreview = document.createElement("div");
   routePreview.classList.add("routePreview");
 
-  let stops: StopInfo[] = normalizeDepartureStops(departure);
+  let stops: StopInfo[] = trimStopsFromStation(
+    normalizeDepartureStops(departure),
+    originStationName
+  );
   const routeStops = document.createElement("div");
   routeStops.classList.add("routeStops");
 
@@ -470,7 +487,7 @@ async function createDepartureCard(
       return;
     }
 
-    stops = fetchedStops;
+    stops = trimStopsFromStation(fetchedStops, originStationName);
     renderStopList(stops);
     routeLoaded = true;
   };
@@ -681,16 +698,18 @@ class NmbsWidget extends WidgetBase {
       this.settings.station?.name ||
       this.settings.station?.id;
 
-    for (const departure of this.cachedDepartures.slice(
+    const visibleDepartures = this.cachedDepartures.slice(
       0,
       this.displayedTrainCount
-    )) {
+    );
+    for (let i = 0; i < visibleDepartures.length; i++) {
       if (signal?.aborted) return;
       await createDepartureCard(
-        departure,
+        visibleDepartures[i],
         this.elements.bottomContainer!,
         expandedTracker,
         originStationName,
+        i,
         signal
       );
       if (signal?.aborted) return;
@@ -869,9 +888,9 @@ class NmbsWidget extends WidgetBase {
 
     this.hideInfo();
     const results = stations.slice(0, this.searchResultLimit);
-    for (const station of results) {
+    for (let i = 0; i < results.length; i++) {
       if (signal.aborted) return;
-      this.createStationOption(station, signal);
+      this.createStationOption(results[i], i, signal);
       if (signal.aborted) return;
     }
 
@@ -880,10 +899,11 @@ class NmbsWidget extends WidgetBase {
     }
   }
 
-  createStationOption(station: any, signal: AbortSignal) {
+  createStationOption(station: any, cardIndex: number, signal: AbortSignal) {
     if (signal.aborted) return;
 
     const stationCard = document.createElement("div");
+    stationCard.style.animationDelay = `${cardIndex * CARD_APPEAR_STAGGER_MS}ms`;
     stationCard.dataset["stationId"] = station.id;
     stationCard.dataset["stationStandardname"] = station.standardname;
     stationCard.dataset["stationName"] = station.name;

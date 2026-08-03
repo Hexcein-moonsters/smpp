@@ -216,6 +216,9 @@
   var loadingSpinnerSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="loading-spinner">
   <path d="M21 12a9 9 0 1 1-6.219-8.56"></path>
 </svg>`;
+  var occupancyPersonSvg = `<svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+<path d="M16 15.503A5.041 5.041 0 1 0 16 5.42a5.041 5.041 0 0 0 0 10.083zm0 2.215c-6.703 0-11 3.699-11 5.5v3.363h22v-3.363c0-2.178-4.068-5.5-11-5.5z"/>
+</svg>`;
   var trashSvg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none">
 <path d="M18 6L17.1991 18.0129C17.129 19.065 17.0939 19.5911 16.8667 19.99C16.6666 20.3412 16.3648 20.6235 16.0011 20.7998C15.588 21 15.0607 21 14.0062 21H9.99377C8.93927 21 8.41202 21 7.99889 20.7998C7.63517 20.6235 7.33339 20.3412 7.13332 19.99C6.90607 19.5911 6.871 19.065 6.80086 18.0129L6 6M4 6H20M16 6L15.7294 5.18807C15.4671 4.40125 15.3359 4.00784 15.0927 3.71698C14.8779 3.46013 14.6021 3.26132 14.2905 3.13878C13.9376 3 13.523 3 12.6936 3H11.3064C10.477 3 10.0624 3 9.70951 3.13878C9.39792 3.26132 9.12208 3.46013 8.90729 3.71698C8.66405 4.00784 8.53292 4.40125 8.27064 5.18807L8 6M14 10V17M10 10V17" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>
 </svg>`;
@@ -5980,6 +5983,12 @@ Is it scaring you off?`,
             "settings-page-max-assignments-slider",
             "TakenWidget.maxAssignments"
           );
+          const puntenMonochromeButton = document.getElementById(
+            "settings-page-punten-monochrome-button"
+          );
+          if (puntenMonochromeButton) {
+            puntenMonochromeButton.checked = await getWidgetSetting("PuntenWidget.monochrome");
+          }
           if (!liteMode) {
             const showSnakeGridButton = document.getElementById(
               "settings-page-show-snake-grid-button"
@@ -6178,6 +6187,11 @@ Is it scaring you off?`,
             "settings-page-max-assignments-slider",
             "TakenWidget.maxAssignments",
             "number"
+          );
+          await updateWidgetSetting(
+            "settings-page-punten-monochrome-button",
+            "PuntenWidget.monochrome",
+            "boolean"
           );
           if (!liteMode) {
             await updateWidgetSetting(
@@ -6667,6 +6681,16 @@ Is it scaring you off?`,
               "10",
               "settings-page-max-assignments-slider",
               "Max assignments"
+            )
+          );
+          this.settingsPage.appendChild(createSectionTitle("Punten"));
+          this.settingsPage.appendChild(
+            createDescription("Change the punten app configuration.")
+          );
+          this.settingsPage.appendChild(
+            createSettingsButtonWithLabel(
+              "settings-page-punten-monochrome-button",
+              "Monochrome"
             )
           );
           if (!liteMode) {
@@ -13341,9 +13365,6 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     const minutes = Math.round(delayValue / 60);
     return minutes === 0 ? "+1 min" : `+${minutes} min`;
   }
-  function buildTicketPurchaseUrl() {
-    return "https://www.belgiantrain.be/en";
-  }
   function getSearchableStationName(station) {
     return [station.standardname, station.name, station.id].join(" ").toLowerCase();
   }
@@ -13380,6 +13401,22 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
       return departure.stop.map(normalizeStopData);
     }
     return [];
+  }
+  function trimStopsFromStation(stops, originStationName) {
+    if (!originStationName) {
+      return stops;
+    }
+    const origin = normalizeText(originStationName);
+    let originIndex = stops.findIndex(
+      (stop) => normalizeText(stop.station) === origin
+    );
+    if (originIndex === -1) {
+      originIndex = stops.findIndex((stop) => {
+        const station = normalizeText(stop.station);
+        return station.includes(origin) || origin.includes(station);
+      });
+    }
+    return originIndex > 0 ? stops.slice(originIndex) : stops;
   }
   function extractOccupancyText(rawOccupancy) {
     if (rawOccupancy == null || rawOccupancy === "") {
@@ -13485,7 +13522,8 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     stationSearchCache = Array.isArray(stationField) ? stationField : [stationField];
     return stationSearchCache;
   }
-  async function createDepartureCard(departure, container, expandedTracker, originStationName, signal) {
+  var CARD_APPEAR_STAGGER_MS = 75;
+  async function createDepartureCard(departure, container, expandedTracker, originStationName, cardIndex, signal) {
     if (signal?.aborted) return;
     const trainNumber = departure.vehicleinfo?.shortname || departure.vehicle || "Onbekend";
     const destination = departure.direction?.name || departure.station || "-";
@@ -13494,8 +13532,7 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     const delayText = formatDelay(departure.delay, departure.canceled);
     const card = document.createElement("div");
     card.classList.add("trainCard");
-    const ticketUrl = buildTicketPurchaseUrl();
-    card.dataset["ticketUrl"] = ticketUrl;
+    card.style.animationDelay = `${cardIndex * CARD_APPEAR_STAGGER_MS}ms`;
     const canceledFlag = departure.canceled === "1" || departure.canceled === 1 || departure.canceled === true;
     if (canceledFlag) {
       card.classList.add("trainCancelled");
@@ -13542,21 +13579,16 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     if (occupancyInfo) {
       const occupancyBox = document.createElement("span");
       occupancyBox.classList.add("occupancy-box", occupancyInfo.className);
-      occupancyBox.textContent = occupancyInfo.label;
+      occupancyBox.title = occupancyInfo.label;
+      occupancyBox.innerHTML = occupancyPersonSvg.repeat(3);
       cardBottom.appendChild(occupancyBox);
     }
-    const buyTicketButton = document.createElement("button");
-    buyTicketButton.type = "button";
-    buyTicketButton.classList.add("buyTicketButton");
-    buyTicketButton.textContent = "Ticket";
-    buyTicketButton.addEventListener("click", (event) => {
-      event.stopPropagation();
-      window.open(ticketUrl, "_blank", "noopener,noreferrer");
-    });
-    cardBottom.appendChild(buyTicketButton);
     const routePreview = document.createElement("div");
     routePreview.classList.add("routePreview");
-    let stops = normalizeDepartureStops(departure);
+    let stops = trimStopsFromStation(
+      normalizeDepartureStops(departure),
+      originStationName
+    );
     const routeStops = document.createElement("div");
     routeStops.classList.add("routeStops");
     let routeLoaded = stops.length > 0;
@@ -13644,7 +13676,7 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
         }
         return;
       }
-      stops = fetchedStops;
+      stops = trimStopsFromStation(fetchedStops, originStationName);
       renderStopList(stops);
       routeLoaded = true;
     };
@@ -13814,16 +13846,18 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     async renderTrains(signal) {
       const expandedTracker = { card: null };
       const originStationName = this.settings.station?.standardname || this.settings.station?.name || this.settings.station?.id;
-      for (const departure of this.cachedDepartures.slice(
+      const visibleDepartures = this.cachedDepartures.slice(
         0,
         this.displayedTrainCount
-      )) {
+      );
+      for (let i5 = 0; i5 < visibleDepartures.length; i5++) {
         if (signal?.aborted) return;
         await createDepartureCard(
-          departure,
+          visibleDepartures[i5],
           this.elements.bottomContainer,
           expandedTracker,
           originStationName,
+          i5,
           signal
         );
         if (signal?.aborted) return;
@@ -13968,18 +14002,19 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
       }
       this.hideInfo();
       const results = stations.slice(0, this.searchResultLimit);
-      for (const station of results) {
+      for (let i5 = 0; i5 < results.length; i5++) {
         if (signal.aborted) return;
-        this.createStationOption(station, signal);
+        this.createStationOption(results[i5], i5, signal);
         if (signal.aborted) return;
       }
       if (stations.length > this.searchResultLimit) {
         this.addShowMoreStationsButton();
       }
     }
-    createStationOption(station, signal) {
+    createStationOption(station, cardIndex, signal) {
       if (signal.aborted) return;
       const stationCard = document.createElement("div");
+      stationCard.style.animationDelay = `${cardIndex * CARD_APPEAR_STAGGER_MS}ms`;
       stationCard.dataset["stationId"] = station.id;
       stationCard.dataset["stationStandardname"] = station.standardname;
       stationCard.dataset["stationName"] = station.name;
@@ -14846,11 +14881,22 @@ ${code}`;
   var GOED_BEZIG_GRENS = 70;
   var UITSTEKEND_GRENS = 80;
   var PuntenWidget = class extends WidgetBase {
+    body = null;
     get category() {
       return "other";
     }
     get name() {
       return "PuntenWidget";
+    }
+    defaultSettings() {
+      return {
+        monochrome: false
+      };
+    }
+    async onSettingsChange() {
+      if (this.body) {
+        this.loadPunten(this.body);
+      }
     }
     async fetchEvaluaties() {
       const schoolName = getSchoolName();
@@ -14908,8 +14954,14 @@ ${code}`;
       container.appendChild(title);
       const body = document.createElement("div");
       body.classList.add("punten-body");
-      body.innerText = "Bezig met laden...";
       container.appendChild(body);
+      this.body = body;
+      this.loadPunten(body);
+      return container;
+    }
+    loadPunten(body) {
+      body.innerText = "Bezig met laden...";
+      const monochrome = Boolean(this.settings.monochrome);
       this.fetchEvaluaties().then((evaluaties) => {
         const { vakken: vakken2, overallAverage } = this.berekenGemiddeldes(evaluaties);
         body.innerHTML = "";
@@ -14925,7 +14977,9 @@ ${code}`;
         const overallValue = document.createElement("div");
         overallValue.classList.add("punten-overall-value");
         overallValue.innerText = `${overallAverage.toFixed(1)}%`;
-        overallValue.style.color = this.kleurVoorWaarde(overallAverage);
+        if (!monochrome) {
+          overallValue.style.color = this.kleurVoorWaarde(overallAverage);
+        }
         overallDiv.appendChild(overallValue);
         const overallMessage = document.createElement("div");
         overallMessage.classList.add("punten-overall-message");
@@ -14954,13 +15008,17 @@ ${code}`;
           bar.classList.add("punten-vak-bar");
           const clampedWidth = Math.max(0, Math.min(100, vak.average));
           bar.style.width = `${clampedWidth}%`;
-          const barKleur = vak.average >= GOED_BEZIG_GRENS ? "#5cc951" : vak.average >= VOLDOENDE_GRENS ? "#ffd353" : "#e14448";
-          bar.style.setProperty("background-color", barKleur, "important");
+          if (!monochrome) {
+            const barKleur = vak.average >= GOED_BEZIG_GRENS ? "#5cc951" : vak.average >= VOLDOENDE_GRENS ? "#ffd353" : "#e14448";
+            bar.style.setProperty("background-color", barKleur, "important");
+          }
           barContainer.appendChild(bar);
           const waarde = document.createElement("span");
           waarde.classList.add("punten-vak-value");
           waarde.innerText = `${vak.average.toFixed(1)}%`;
-          waarde.style.color = this.kleurVoorWaarde(vak.average);
+          if (!monochrome) {
+            waarde.style.color = this.kleurVoorWaarde(vak.average);
+          }
           row.append(naam, barContainer, waarde);
           list.appendChild(row);
         });
@@ -14973,7 +15031,6 @@ ${code}`;
         fout.innerText = "Kon je punten niet ophalen.";
         body.appendChild(fout);
       });
-      return container;
     }
     async createPreview() {
       const previewContainer = document.createElement("div");

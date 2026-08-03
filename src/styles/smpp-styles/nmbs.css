@@ -4,11 +4,13 @@
 }
 
 .trainCard {
+  --card-radius: 14px;
+  --card-padding: 10px;
   background-color: var(--color-base01);
   border: 1px solid var(--color-base03);
   align-self: stretch;
-  padding: 10px;
-  border-radius: 16px;
+  padding: var(--card-padding);
+  border-radius: var(--card-radius);
   width: 100%;
   display: flex;
   flex-direction: column;
@@ -16,6 +18,7 @@
 
 .enableAnimations .trainCard {
   animation: nmbsCardAppear 0.3s ease-in-out 0ms 1;
+  animation-fill-mode: backwards;
 }
 
 @keyframes nmbsCardAppear {
@@ -92,60 +95,29 @@
 .occupancy-box {
   display: inline-flex;
   align-items: center;
-  box-sizing: border-box;
-  border: 1px solid #334155;
-  border-radius: 999px;
-  padding: 2px 10px;
   margin: 0 0 0 auto;
-  background: #0f172a;
-  color: #e5eefb;
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.4;
-  white-space: nowrap;
 }
 
-.buyTicketButton {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid var(--color-accent);
-  border-radius: 999px;
-  padding: 4px 10px;
-  background: transparent;
-  color: var(--color-accent);
-  font-size: 12px;
-  font-weight: 700;
-  line-height: 1.2;
-  cursor: pointer;
-  white-space: nowrap;
+.occupancy-box svg {
+  width: 14px;
+  height: 14px;
+  fill: var(--color-base03);
 }
 
-.buyTicketButton:hover {
-  background: var(--color-base02);
+.occupancy-box svg + svg {
+  margin-left: -5px;
 }
 
-.buyTicketButton:focus-visible {
-  outline: 2px solid var(--color-accent);
-  outline-offset: 2px;
+.occupancy-low svg:nth-child(1) {
+  fill: #22c55e;
 }
 
-.occupancy-low {
-  border-color: #22c55e;
-  background: #052e16;
-  color: #dcfce7;
+.occupancy-medium svg:nth-child(-n + 2) {
+  fill: #f59e0b;
 }
 
-.occupancy-medium {
-  border-color: #f59e0b;
-  background: #451a03;
-  color: #ffedd5;
-}
-
-.occupancy-high {
-  border-color: #ef4444;
-  background: #450a0a;
-  color: #fee2e2;
+.occupancy-high svg {
+  fill: #ef4444;
 }
 
 .arrivalTimeDeviation {
@@ -245,13 +217,13 @@
 }
 
 .routePreview {
-  margin-top: 12px;
+  margin-top: 8px;
   display: none;
   width: 100%;
-  padding: 10px;
+  padding: 6px;
   background: var(--color-base02);
   border: 1px solid var(--color-base03);
-  border-radius: 16px;
+  border-radius: calc(var(--card-radius) - var(--card-padding));
 }
 
 .trainCard.expanded .routePreview {
@@ -272,19 +244,11 @@
 
 .routeStops {
   position: relative;
-  padding-left: 18px;
+  padding-left: 14px;
   border-left: 2px solid var(--color-accent);
   display: flex;
   flex-direction: column;
-  gap: 6px;
-}
-
-/* Lift the stops off the card instead of darkening them further, so they read
-   as glass panes rather than a solid block. */
-.glass .routeStopItem {
-  background: rgba(255, 255, 255, 0.08) !important;
-  backdrop-filter: var(--small-blur) !important;
-  border-color: rgba(255, 255, 255, 0.15) !important;
+  gap: 3px;
 }
 
 .glass .routeStopItem::before {
@@ -293,14 +257,11 @@
 
 .routeStopItem {
   position: relative;
-  padding: 12px 14px 12px 22px;
+  padding: 3px 4px 3px 12px;
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: 10px;
   align-items: flex-start;
-  background: var(--color-base01);
-  border: 1px solid var(--color-base03);
-  border-radius: 16px;
 }
 
 .routeStopItem::before {
@@ -318,10 +279,6 @@
 
 .routeStopItem.routeStopFirst::before {
   background: var(--color-accent);
-}
-
-.routeStopItem.routeStopLast {
-  border-bottom: none;
 }
 
 .routeStopLeft {
@@ -359,10 +316,6 @@
   font-size: 12px;
   font-weight: 700;
   color: var(--color-accent);
-}
-
-.routeStopItem + .routeStopItem {
-  margin-top: 4px;
 }
 
 .expandStopsButton {

@@ -78,6 +78,8 @@
   height: 100%;
   border-radius: 1rem;
   transition: width 0.3s ease;
+  /* Fallback for monochrome mode; overridden inline per score otherwise */
+  background-color: var(--color-accent);
 }
 
 .punten-vak-value {

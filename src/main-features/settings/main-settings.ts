@@ -544,6 +544,15 @@ export class SettingsWindow extends BaseWindow {
           "TakenWidget.maxAssignments"
         );
 
+        // Punten
+        const puntenMonochromeButton = document.getElementById(
+          "settings-page-punten-monochrome-button"
+        );
+        if (puntenMonochromeButton) {
+          (puntenMonochromeButton as HTMLInputElement).checked =
+            await getWidgetSetting("PuntenWidget.monochrome");
+        }
+
         // Snake
         if (!liteMode) {
           const showSnakeGridButton = document.getElementById(
@@ -819,6 +828,13 @@ export class SettingsWindow extends BaseWindow {
           "settings-page-max-assignments-slider",
           "TakenWidget.maxAssignments",
           "number"
+        );
+
+        // Punten
+        await updateWidgetSetting(
+          "settings-page-punten-monochrome-button",
+          "PuntenWidget.monochrome",
+          "boolean"
         );
 
         // Snake
@@ -1415,6 +1431,17 @@ export class SettingsWindow extends BaseWindow {
             "10",
             "settings-page-max-assignments-slider",
             "Max assignments"
+          )
+        );
+
+        this.settingsPage.appendChild(createSectionTitle("Punten"));
+        this.settingsPage.appendChild(
+          createDescription("Change the punten app configuration.")
+        );
+        this.settingsPage.appendChild(
+          createSettingsButtonWithLabel(
+            "settings-page-punten-monochrome-button",
+            "Monochrome"
           )
         );
 
