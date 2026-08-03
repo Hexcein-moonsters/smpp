@@ -14959,6 +14959,33 @@ ${code}`;
       this.loadPunten(body);
       return container;
     }
+    maakVakRij(vak, monochrome) {
+      const row = document.createElement("div");
+      row.classList.add("punten-vak-row");
+      const naam = document.createElement("span");
+      naam.classList.add("punten-vak-name");
+      naam.innerText = vak.name;
+      naam.title = vak.name;
+      const barContainer = document.createElement("div");
+      barContainer.classList.add("punten-vak-bar-container");
+      const bar = document.createElement("div");
+      bar.classList.add("punten-vak-bar");
+      const clampedWidth = Math.max(0, Math.min(100, vak.average));
+      bar.style.width = `${clampedWidth}%`;
+      if (!monochrome) {
+        const barKleur = vak.average >= GOED_BEZIG_GRENS ? "#5cc951" : vak.average >= VOLDOENDE_GRENS ? "#ffd353" : "#e14448";
+        bar.style.setProperty("background-color", barKleur, "important");
+      }
+      barContainer.appendChild(bar);
+      const waarde = document.createElement("span");
+      waarde.classList.add("punten-vak-value");
+      waarde.innerText = `${vak.average.toFixed(1)}%`;
+      if (!monochrome) {
+        waarde.style.color = this.kleurVoorWaarde(vak.average);
+      }
+      row.append(naam, barContainer, waarde);
+      return row;
+    }
     loadPunten(body) {
       body.innerText = "Bezig met laden...";
       const monochrome = Boolean(this.settings.monochrome);
@@ -14986,43 +15013,35 @@ ${code}`;
         overallMessage.innerText = this.boodschapVoorGemiddelde(overallAverage);
         overallDiv.appendChild(overallMessage);
         body.appendChild(overallDiv);
-        const verbeterVakken = vakken2.filter((v3) => v3.average < GOED_BEZIG_GRENS);
-        if (verbeterVakken.length > 0) {
-          const verbeterMessage = document.createElement("div");
-          verbeterMessage.classList.add("punten-verbeter-message");
-          verbeterMessage.innerText = verbeterVakken.length === 1 ? "1 vak heeft verbetering nodig:" : `${verbeterVakken.length} vakken hebben verbetering nodig:`;
-          body.appendChild(verbeterMessage);
+        const groepen = [
+          {
+            titel: "Onvoldoende",
+            vakken: vakken2.filter((v3) => v3.average < VOLDOENDE_GRENS)
+          },
+          {
+            titel: "Kan beter",
+            vakken: vakken2.filter(
+              (v3) => v3.average >= VOLDOENDE_GRENS && v3.average < GOED_BEZIG_GRENS
+            )
+          },
+          {
+            titel: "Goed",
+            vakken: vakken2.filter((v3) => v3.average >= GOED_BEZIG_GRENS)
+          }
+        ];
+        for (const groep of groepen) {
+          if (groep.vakken.length === 0) continue;
+          const groepTitel = document.createElement("div");
+          groepTitel.classList.add("punten-groep-titel");
+          groepTitel.innerText = groep.titel;
+          body.appendChild(groepTitel);
+          const list = document.createElement("div");
+          list.classList.add("punten-vakken-list");
+          groep.vakken.forEach((vak) => {
+            list.appendChild(this.maakVakRij(vak, monochrome));
+          });
+          body.appendChild(list);
         }
-        const list = document.createElement("div");
-        list.classList.add("punten-vakken-list");
-        vakken2.forEach((vak) => {
-          const row = document.createElement("div");
-          row.classList.add("punten-vak-row");
-          const naam = document.createElement("span");
-          naam.classList.add("punten-vak-name");
-          naam.innerText = vak.name;
-          naam.title = vak.name;
-          const barContainer = document.createElement("div");
-          barContainer.classList.add("punten-vak-bar-container");
-          const bar = document.createElement("div");
-          bar.classList.add("punten-vak-bar");
-          const clampedWidth = Math.max(0, Math.min(100, vak.average));
-          bar.style.width = `${clampedWidth}%`;
-          if (!monochrome) {
-            const barKleur = vak.average >= GOED_BEZIG_GRENS ? "#5cc951" : vak.average >= VOLDOENDE_GRENS ? "#ffd353" : "#e14448";
-            bar.style.setProperty("background-color", barKleur, "important");
-          }
-          barContainer.appendChild(bar);
-          const waarde = document.createElement("span");
-          waarde.classList.add("punten-vak-value");
-          waarde.innerText = `${vak.average.toFixed(1)}%`;
-          if (!monochrome) {
-            waarde.style.color = this.kleurVoorWaarde(vak.average);
-          }
-          row.append(naam, barContainer, waarde);
-          list.appendChild(row);
-        });
-        body.appendChild(list);
       }).catch((error) => {
         console.error("SMPP: Kon punten niet ophalen:", error);
         body.innerHTML = "";
