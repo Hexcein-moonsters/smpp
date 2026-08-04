@@ -13284,7 +13284,7 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     addShowMoreHaltesButton() {
       const showMoreButton = document.createElement("button");
       showMoreButton.classList.add("showMoreHaltesButton");
-      showMoreButton.innerText = "Toon meer";
+      showMoreButton.innerText = "Meer";
       showMoreButton.addEventListener("click", () => {
         this.searchResultLimit += 5;
         showMoreButton.remove();
@@ -13356,11 +13356,11 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
   function formatDelay(delaySeconds, canceled) {
     const canceledFlag = canceled === "1" || canceled === 1 || canceled === true;
     if (canceledFlag) {
-      return "Geannuleerd";
+      return "Cancelled";
     }
     const delayValue = Number(delaySeconds) || 0;
     if (delayValue === 0) {
-      return "Op tijd";
+      return "On time";
     }
     const minutes = Math.round(delayValue / 60);
     return minutes === 0 ? "+1 min" : `+${minutes} min`;
@@ -13555,6 +13555,9 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     const trainDestinationElement = document.createElement("span");
     trainDestinationElement.classList.add("trainDestination");
     trainDestinationElement.textContent = destination;
+    if (destination.length > 15) {
+      trainDestinationElement.classList.add("trainDestinationLong");
+    }
     centerBlock.appendChild(trainDestinationElement);
     const rightBlock = document.createElement("div");
     rightBlock.classList.add("trainCardRight");
@@ -13565,7 +13568,6 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     statusLabel.classList.add("statusLabel");
     statusLabel.textContent = delayText;
     rightBlock.appendChild(timeElement);
-    rightBlock.appendChild(statusLabel);
     cardTop.appendChild(leftBlock);
     cardTop.appendChild(centerBlock);
     cardTop.appendChild(rightBlock);
@@ -13583,6 +13585,8 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
       occupancyBox.innerHTML = occupancyPersonSvg.repeat(3);
       cardBottom.appendChild(occupancyBox);
     }
+    const trainCardSeparator = document.createElement("div");
+    trainCardSeparator.classList.add("trainCardSeparator");
     const routePreview = document.createElement("div");
     routePreview.classList.add("routePreview");
     let stops = trimStopsFromStation(
@@ -13697,7 +13701,9 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
       card.addEventListener("click", () => toggleStops());
     }
     card.appendChild(cardTop);
+    card.appendChild(statusLabel);
     card.appendChild(cardBottom);
+    card.appendChild(trainCardSeparator);
     if (routeLoaded || canFetchVehicleStops) {
       card.appendChild(routePreview);
     }
@@ -13763,14 +13769,12 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
       this.elements.searchInput = document.createElement("input");
       this.elements.searchInput.classList.add("popupinput", "stationInput");
       this.elements.searchInput.spellcheck = false;
-      this.elements.searchInput.placeholder = "Zoek station";
       this.elements.searchInput.addEventListener(
         "keyup",
         (event) => {
           if (event.key === "Enter") {
             this.handleStationSearch();
           } else {
-            this.debouncedSearch();
           }
         }
       );
@@ -13925,7 +13929,9 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
         (d3) => !existingKeys.has(`${d3.vehicle}-${d3.time}`)
       );
       this.cachedDepartures = this.cachedDepartures.concat(uniqueNewDepartures);
-      this.cachedDepartures.sort((a5, b3) => (a5.time || 0) - (b3.time || 0));
+      this.cachedDepartures.sort(
+        (a5, b3) => (a5.time || 0) - (b3.time || 0)
+      );
       return true;
     }
     addShowLessTrainsButton() {
@@ -14022,11 +14028,13 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
       const title = document.createElement("h3");
       title.classList.add("stationTitle");
       title.textContent = station.standardname;
-      const detail = document.createElement("div");
-      detail.classList.add("stationDetail");
-      detail.textContent = `${station.name} \u2022 ${station.id.replace("BE.NMBS.", "")}`;
       stationCard.appendChild(title);
-      stationCard.appendChild(detail);
+      if (station.name !== station.standardname) {
+        const detail = document.createElement("div");
+        detail.classList.add("stationDetail");
+        detail.textContent = `${station.name}`;
+        stationCard.appendChild(detail);
+      }
       stationCard.addEventListener("click", (event) => {
         this.choseThisStation(event.currentTarget);
       });
@@ -14034,17 +14042,17 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
       this.elements.bottomContainer.appendChild(stationCard);
     }
     async choseThisStation(stationElement) {
-      this.currentStationSearchAbortController?.abort();
       await this.setSetting("station", {
         id: stationElement.dataset["stationId"],
         standardname: stationElement.dataset["stationStandardname"],
         name: stationElement.dataset["stationName"]
       });
+      this.lastLiveboardFetchTime = Date.now() - 1e4;
     }
     addShowMoreStationsButton() {
       const showMoreButton = document.createElement("button");
       showMoreButton.classList.add("showMoreStationsButton");
-      showMoreButton.innerText = "Toon meer";
+      showMoreButton.innerText = "Meer";
       showMoreButton.addEventListener("click", () => {
         this.searchResultLimit += 5;
         showMoreButton.remove();

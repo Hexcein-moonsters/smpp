@@ -269,6 +269,9 @@
 
 .delijnInfoContainerVisible {
   display: flex;
+  background-color: var(--darken-background);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
 }
 
 .delijn-preview-title {

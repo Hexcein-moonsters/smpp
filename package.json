@@ -27,5 +27,8 @@
     "browser-image-compression": "^2.0.2",
     "colord": "^2.9.3",
     "node-vibrant": "^4.0.4"
+  },
+  "allowScripts": {
+    "esbuild@0.28.1": true
   }
 }

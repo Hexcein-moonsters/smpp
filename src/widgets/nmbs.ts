@@ -28,11 +28,11 @@ function formatTime(timestampSeconds: number): string {
 function formatDelay(delaySeconds: unknown, canceled: unknown): string {
   const canceledFlag = canceled === "1" || canceled === 1 || canceled === true;
   if (canceledFlag) {
-    return "Geannuleerd";
+    return "Cancelled";
   }
   const delayValue = Number(delaySeconds) || 0;
   if (delayValue === 0) {
-    return "Op tijd";
+    return "On time";
   }
   const minutes = Math.round(delayValue / 60);
   return minutes === 0 ? "+1 min" : `+${minutes} min`;
@@ -330,6 +330,10 @@ async function createDepartureCard(
   const trainDestinationElement = document.createElement("span");
   trainDestinationElement.classList.add("trainDestination");
   trainDestinationElement.textContent = destination;
+
+  if (destination.length > 15) {
+    trainDestinationElement.classList.add("trainDestinationLong");
+  }
   centerBlock.appendChild(trainDestinationElement);
 
   const rightBlock = document.createElement("div");
@@ -344,7 +348,6 @@ async function createDepartureCard(
   statusLabel.textContent = delayText;
 
   rightBlock.appendChild(timeElement);
-  rightBlock.appendChild(statusLabel);
 
   cardTop.appendChild(leftBlock);
   cardTop.appendChild(centerBlock);
@@ -366,6 +369,9 @@ async function createDepartureCard(
     occupancyBox.innerHTML = occupancyPersonSvg.repeat(3);
     cardBottom.appendChild(occupancyBox);
   }
+  // traincard separator
+  const trainCardSeparator = document.createElement("div");
+  trainCardSeparator.classList.add("trainCardSeparator");
 
   // optional route preview (dropdown-style stop list)
   const routePreview = document.createElement("div");
@@ -431,7 +437,8 @@ async function createDepartureCard(
       routeStops.appendChild(item);
     });
 
-     routePreview.replaceChildren(routeStops);  };
+    routePreview.replaceChildren(routeStops);
+  };
 
   const setExpanded = (expanded: boolean) => {
     if (expanded) {
@@ -514,7 +521,9 @@ async function createDepartureCard(
   }
 
   card.appendChild(cardTop);
+  card.appendChild(statusLabel);
   card.appendChild(cardBottom);
+  card.appendChild(trainCardSeparator);
 
   if (routeLoaded || canFetchVehicleStops) {
     card.appendChild(routePreview);
@@ -596,14 +605,14 @@ class NmbsWidget extends WidgetBase {
     this.elements.searchInput = document.createElement("input");
     this.elements.searchInput!.classList.add("popupinput", "stationInput");
     this.elements.searchInput!.spellcheck = false;
-    this.elements.searchInput!.placeholder = "Zoek station";
     this.elements.searchInput!.addEventListener(
       "keyup",
       (event: KeyboardEvent) => {
         if (event.key === "Enter") {
           this.handleStationSearch();
         } else {
-          this.debouncedSearch();
+          // not needed for now
+          // this.debouncedSearch();
         }
       }
     );
@@ -687,7 +696,7 @@ class NmbsWidget extends WidgetBase {
     this.hideInfo();
     departures.sort((a: any, b: any) => (a.time || 0) - (b.time || 0));
     this.cachedDepartures = departures;
-     this.displayedTrainCount = Number(this.settings.maxTrains) || 5;
+    this.displayedTrainCount = Number(this.settings.maxTrains) || 5;
     await this.renderTrains(signal);
   }
 
@@ -761,7 +770,8 @@ class NmbsWidget extends WidgetBase {
     }
     this.lastLiveboardFetchTime = now;
 
-    const lastDeparture = this.cachedDepartures[this.cachedDepartures.length - 1];
+    const lastDeparture =
+      this.cachedDepartures[this.cachedDepartures.length - 1];
     // Vraag de liveboard op vanaf net na de laatste gekende trein, zodat we verder
     // dan het standaard tijdsvenster van iRail (ongeveer 1 uur) vooruit kunnen kijken.
     const anchorDate = new Date((Number(lastDeparture.time) + 60) * 1000);
@@ -799,7 +809,9 @@ class NmbsWidget extends WidgetBase {
     );
 
     this.cachedDepartures = this.cachedDepartures.concat(uniqueNewDepartures);
-    this.cachedDepartures.sort((a: any, b: any) => (a.time || 0) - (b.time || 0));
+    this.cachedDepartures.sort(
+      (a: any, b: any) => (a.time || 0) - (b.time || 0)
+    );
     return true;
   }
 
@@ -907,18 +919,21 @@ class NmbsWidget extends WidgetBase {
     stationCard.dataset["stationId"] = station.id;
     stationCard.dataset["stationStandardname"] = station.standardname;
     stationCard.dataset["stationName"] = station.name;
+
     stationCard.classList.add("trainCard", "trainCardStation");
 
     const title = document.createElement("h3");
     title.classList.add("stationTitle");
     title.textContent = station.standardname;
 
-    const detail = document.createElement("div");
-    detail.classList.add("stationDetail");
-    detail.textContent = `${station.name} • ${station.id.replace("BE.NMBS.", "")}`;
-
     stationCard.appendChild(title);
-    stationCard.appendChild(detail);
+
+    if (station.name !== station.standardname) {
+      const detail = document.createElement("div");
+      detail.classList.add("stationDetail");
+      detail.textContent = `${station.name}`;
+      stationCard.appendChild(detail);
+    }
 
     stationCard.addEventListener("click", (event: MouseEvent) => {
       this.choseThisStation(event.currentTarget as HTMLElement);
@@ -929,18 +944,18 @@ class NmbsWidget extends WidgetBase {
   }
 
   async choseThisStation(stationElement: HTMLElement) {
-    this.currentStationSearchAbortController?.abort();
     await this.setSetting("station", {
       id: stationElement.dataset["stationId"],
       standardname: stationElement.dataset["stationStandardname"],
       name: stationElement.dataset["stationName"],
     });
+    this.lastLiveboardFetchTime = Date.now() - 10000;
   }
 
   addShowMoreStationsButton() {
     const showMoreButton = document.createElement("button");
     showMoreButton.classList.add("showMoreStationsButton");
-    showMoreButton.innerText = "Toon meer";
+    showMoreButton.innerText = "Meer";
     showMoreButton.addEventListener("click", () => {
       this.searchResultLimit += 5;
       showMoreButton.remove();

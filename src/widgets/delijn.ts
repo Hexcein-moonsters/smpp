@@ -95,8 +95,8 @@ async function createHalteDoorkomst(doorkomst, container, monochrome, signal) {
       arrivalTimeDeviation === 0
         ? "On time"
         : arrivalTimeDeviation > 0
-        ? `+${arrivalTimeDeviation}`
-        : arrivalTimeDeviation;
+          ? `+${arrivalTimeDeviation}`
+          : arrivalTimeDeviation;
     timeUntilDeparture = calculateTimeUntilDepartureInMins(ETA);
     timeUntilDeparture =
       timeUntilDeparture < 1 ? "Now" : `${timeUntilDeparture} Min.`;
@@ -570,7 +570,7 @@ class DelijnWidget extends WidgetBase {
   addShowMoreHaltesButton() {
     const showMoreButton = document.createElement("button");
     showMoreButton.classList.add("showMoreHaltesButton");
-    showMoreButton.innerText = "Toon meer";
+    showMoreButton.innerText = "Meer";
     showMoreButton.addEventListener("click", () => {
       this.searchResultLimit += 5;
       showMoreButton.remove();

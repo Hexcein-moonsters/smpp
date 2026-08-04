@@ -4,16 +4,20 @@
 }
 
 .trainCard {
-  --card-radius: 14px;
+  --card-radius: 20px;
   --card-padding: 10px;
   background-color: var(--color-base01);
-  border: 1px solid var(--color-base03);
+  border: 2px solid var(--color-base03);
   align-self: stretch;
   padding: var(--card-padding);
   border-radius: var(--card-radius);
   width: 100%;
   display: flex;
+  gap: 0.5rem;
   flex-direction: column;
+  interpolate-size: allow-keywords;
+  height: fit-content;
+  transition: height 0.2s ease-in-out;
 }
 
 .enableAnimations .trainCard {
@@ -40,7 +44,7 @@
 .stationTitle {
   font-size: 16px;
   font-weight: 600;
-  margin-bottom: 2px !important;
+  margin-bottom: 0px !important;
 }
 
 .stationDetail {
@@ -64,7 +68,7 @@
 }
 
 .enableAnimations .trainCardStation:hover {
-  transform: scale(1.05);
+  transform: scale(1.02);
 }
 
 .trainCardStation:hover {
@@ -75,7 +79,7 @@
 
 
 .trainDestination.trainDestinationLong {
-  font-size: 15.5px;
+  font-size: 14px;
 }
 
 .trainCardBottom {
@@ -146,7 +150,7 @@
 .trainCardTop {
   display: flex;
   flex-wrap: wrap;
-  gap: 12px;
+  gap:  0.75rem;
   width: 100%;
   justify-content: space-between;
   align-items: center;
@@ -196,10 +200,7 @@
   font-size: 12px;
   font-weight: 700;
   color: var(--color-accent);
-}
-
-.trainOnTime .statusLabel {
-  color: #4caf50;
+  text-align: right;
 }
 
 .trainLate .statusLabel,
@@ -217,17 +218,27 @@
 }
 
 .routePreview {
-  margin-top: 8px;
   display: none;
   width: 100%;
   padding: 6px;
-  background: var(--color-base02);
-  border: 1px solid var(--color-base03);
   border-radius: calc(var(--card-radius) - var(--card-padding));
 }
 
 .trainCard.expanded .routePreview {
   display: block;
+  height: auto;
+}
+
+.trainCard.expanded .trainCardSeparator {
+  display: block;
+}
+
+.trainCardSeparator{
+  display: none;
+  width: 100%;
+  height: 2px;
+  background-color: var(--color-base03);
+  border-radius: 10000px;
 }
 
 .trainCardExpandable {
@@ -240,6 +251,10 @@
 
 .trainCardExpandable:hover {
   background-color: var(--color-base02);
+  transform: scale(1.02);
+}
+.trainCardExpandable.expanded{
+  transform: scale(1.0);
 }
 
 .routeStops {
@@ -267,7 +282,7 @@
 .routeStopItem::before {
   content: "";
   position: absolute;
-  left: -12px;
+  left: -10px;
   top: 50%;
   transform: translateY(-50%);
   width: 10px;
@@ -336,7 +351,6 @@
 
 .platformLabel {
   font-size: 13px;
-  margin-left: 10px;
   color: var(--color-base04);
   align-self: center;
   white-space: nowrap;
@@ -448,7 +462,7 @@
 #nmbsBottomContainer {
   display: flex;
   flex-direction: column;
-  gap: 12.5px;
+  gap: 1rem;
 }
 
 .showMoreStationsButton {
@@ -535,6 +549,9 @@
 
 .nmbsInfoContainerVisible {
   display: flex;
+  background-color: var(--darken-background);
+  padding: 0.5rem 1rem;
+  border-radius: 1rem;
 }
 
 .nmbs-preview {
@@ -553,20 +570,24 @@
 .nmbs-preview-image {
   width: 80%;
 }
+
+
 .trainTypeBadge {
   border: 2px solid var(--color-accent);
+  background: color-mix(in srgb, var(--color-base00) 80%, var(--color-accent) 20%);
   color: var(--color-accent);
   font-weight: 700;
-  font-size: 14px;
+  font-size: 1.25rem;
   min-width: 38px;
   text-align: center;
-  border-radius: 8px;
-  padding: 4px 6px;
+  border-radius: 0.75rem;
+  padding: 0.25rem 0.75rem;
   text-transform: uppercase;
 }
 
-.trainCardBottom {
-  margin-top: 6px;
+
+.glass .trainTypeBadge{
+    background: var(--darken-background);
 }
 
 .platformLabel {
