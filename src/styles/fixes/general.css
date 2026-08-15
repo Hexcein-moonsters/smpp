@@ -438,7 +438,8 @@ td.selected {
   background-color: var(--color-base00) !important;
 }
 
-td:not(.details-cell), hover {
+td:not(.details-cell),
+hover {
   background-color: transparent !important;
 }
 
@@ -449,7 +450,7 @@ smsc-inlineeditor.smsc-table__cell--inlineeditor {
   background-color: transparent !important;
 }
 
-#result-table{
+#result-table {
   color: var(--color-text, black);
 }
 
@@ -1372,6 +1373,10 @@ input[name="email"] {
 .nr_recipients_bubble {
   display: none !important;
 }
+
+/* Checkboxes */
+
+.checkbox-module_checkbox__ppVd8 input[type="checkbox"],
 .input-FZRHX,
 label.checkbox input[type="checkbox"],
 div.smscCheckbox input[type="checkbox"],
@@ -1398,6 +1403,8 @@ smsc-listview .checkbox-button {
   background-repeat: no-repeat !important;
   background-size: cover !important;
 }
+
+.checkbox-module_checkbox__ppVd8 input[type="checkbox"]:checked,
 .input-FZRHX:checked,
 .moveToPostbox__item__icon,
 label.checkbox input[type="checkbox"]:checked,
