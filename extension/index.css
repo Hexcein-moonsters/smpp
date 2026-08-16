@@ -9559,6 +9559,18 @@ button.filter-btn.c-red-combo-hover--100:hover {
   background: var(--color-base01) !important;
   border-color: var(--color-base02) !important;
 }
+.input-Axuwg {
+  border: none !important;
+  outline: none !important;
+}
+.glass .planner-header-search-input {
+  background: var(--darken-background) !important;
+  backdrop-filter: var(--small-blur) !important;
+}
+.glass .input-Axuwg,
+.glass .keyIcon-aoeax {
+  background: transparent !important;
+}
 .checkbox-module_label__QQfB,
 .iconLabel-module_label__89RYV {
   color: var(--color-accent) !important;
@@ -9567,9 +9579,18 @@ button.filter-btn.c-red-combo-hover--100:hover {
   background-color: var(--color-base01) !important;
   border-color: var(--color-base02) !important;
 }
+.glass .filterButton-KvpZ5 {
+  background-color: var(--darken-background) !important;
+  backdrop-filter: var(--small-blur) !important;
+}
 .filterButton-KvpZ5:hover {
   background-color: var(--color-base02) !important;
   border-color: var(--color-base03) !important;
+}
+.glass .planner-header .calendar-filter-button {
+  background: var(--darken-background) !important;
+  backdrop-filter: var(--small-blur) !important;
+  border-color: transparent !important;
 }
 .bubble-module_bubble__W48bE {
   background: var(--color-base01) !important;
@@ -9598,6 +9619,7 @@ button.filter-btn.c-red-combo-hover--100:hover {
   border: 2px solid var(--color-base02) !important;
   border-radius: 0.66rem;
   background: var(--color-base01) !important;
+  overflow: hidden !important;
 }
 .OptionView-module_optionWrapper__sUAD3 {
   &[data-selected=true] {
