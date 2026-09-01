@@ -9790,6 +9790,96 @@ button.filter-btn.c-red-combo-hover--100:hover {
   background-color: var(--color-base02) !important;
   border-color: var(--color-base03) !important;
 }
+[class*=searchPage-] {
+  color: var(--color-text) !important;
+}
+[class*=searchPage-] > [class*=main-] {
+  background: transparent !important;
+}
+[class*=searchPage-] [class*=savedFiltersPanel-],
+[class*=searchPage-] [class*=resultsColumn-] {
+  background: var(--color-base01) !important;
+  border: 2px solid var(--color-base02) !important;
+  border-radius: 1rem !important;
+}
+.glass [class*=searchPage-] [class*=savedFiltersPanel-],
+.glass [class*=searchPage-] [class*=resultsColumn-] {
+  background: var(--darken-background) !important;
+  backdrop-filter: var(--medium-blur) !important;
+}
+[class*=searchPage-] [class*=savedFiltersPanelContent-],
+[class*=searchPage-] [class*=resultsColumn-] > * {
+  background-color: transparent !important;
+}
+[class*=searchPage-] [class*=resultsColumn-] [role=row]:hover {
+  background-color: var(--color-base02) !important;
+}
+[class*=searchPage-] [class*=textInput-large-module_textInput__],
+[class*=searchPage-] input[class*=textInput-large-module_input__] {
+  color: var(--color-text) !important;
+  background-color: var(--color-base01) !important;
+  border-color: var(--color-base02) !important;
+}
+[class*=searchPage-] input[class*=textInput-large-module_input__] {
+  background-color: transparent !important;
+  border: none !important;
+  outline: none !important;
+}
+.glass [class*=searchPage-] [class*=textInput-large-module_textInput__] {
+  background-color: var(--darken-background) !important;
+  backdrop-filter: var(--small-blur) !important;
+}
+[class*=searchPage-] button[class*=badgeButton-module_badgeButton__],
+[class*=searchPage-] button[class*=sortButton-],
+[class*=searchPage-] button[class*=actionsButton-] {
+  color: var(--color-text) !important;
+  background: var(--color-base01) !important;
+  border: 2px solid var(--color-base02) !important;
+}
+.glass [class*=searchPage-] button[class*=badgeButton-module_badgeButton__],
+.glass [class*=searchPage-] button[class*=sortButton-],
+.glass [class*=searchPage-] button[class*=actionsButton-] {
+  background: var(--darken-background) !important;
+  backdrop-filter: var(--small-blur) !important;
+}
+[class*=searchPage-] button[class*=badgeButton-module_badgeButton__]:hover,
+[class*=searchPage-] button[class*=sortButton-]:hover,
+[class*=searchPage-] button[class*=actionsButton-]:hover {
+  background: var(--color-base02) !important;
+  border-color: var(--color-base03) !important;
+}
+[class*=searchPage-] button[class*=badgeButton-module_badgeButton__][class*=combo-hover-blue] {
+  border-color: var(--color-accent) !important;
+}
+[class*=searchPage-] [class*=token-thin-module_token__] {
+  color: var(--color-text) !important;
+  background-color: var(--color-base02) !important;
+  border: 2px solid var(--color-base03) !important;
+  box-shadow: none !important;
+}
+.glass [class*=searchPage-] [class*=token-thin-module_token__] {
+  background-color: var(--darken-background) !important;
+  backdrop-filter: var(--small-blur) !important;
+}
+[class*=searchPage-] [class*=savedFiltersActionButton-],
+[class*=searchPage-] button[class*=frequentlyUsedFilterButton-] {
+  color: var(--color-text) !important;
+  background: var(--color-base01) !important;
+  border: 2px solid var(--color-base02) !important;
+}
+.glass [class*=searchPage-] [class*=savedFiltersActionButton-],
+.glass [class*=searchPage-] button[class*=frequentlyUsedFilterButton-] {
+  background: var(--darken-background) !important;
+  backdrop-filter: var(--small-blur) !important;
+}
+[class*=searchPage-] [class*=savedFiltersActionButton-]:hover,
+[class*=searchPage-] button[class*=frequentlyUsedFilterButton-]:hover {
+  background: var(--color-base02) !important;
+  border-color: var(--color-base03) !important;
+}
+[class*=searchPage-] button[class*=frequentlyUsedFilterButton-][aria-pressed=true] {
+  border-color: var(--color-accent) !important;
+}
 
 /* src/styles/fixes/results.css */
 #smscMain div.wide-toolbar.js-wide-toolbar {
