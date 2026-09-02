@@ -19,6 +19,7 @@ import "./styles/smpp-styles/profile.css";
 import "./styles/smpp-styles/punten.css";
 import "./styles/smpp-styles/notes.css";
 import "./styles/smpp-styles/volgende-vak.css";
+import "./styles/smpp-styles/countdown.css";
 import "./styles/fixes/general.css";
 import "./styles/fixes/login.css";
 import "./styles/fixes/messages.css";
