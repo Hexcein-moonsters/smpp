@@ -10,6 +10,9 @@ const GC_DOMAINS = {
   beta: "https://gcbeta.smartschoolplusplus.com",
 };
 
+// With this you can disable or enable the global chat again. But for now the global chat died on 09/2026 :C byeeeee
+export const globalChatEnabled = false;
+
 class GlobalChatWindow extends BaseWindow {
   iframe: HTMLIFrameElement;
   gcContent: HTMLDivElement;
@@ -35,6 +38,7 @@ let gcWindow: GlobalChatWindow;
 let gcGlass: boolean;
 
 export async function openGlobalChat(event, beta = false) {
+  if (!globalChatEnabled) return;
   if (gcWindow?.beta != beta) {
     recreateGlobalChat();
   }
@@ -70,6 +74,7 @@ export function createGC() {
 // public smpp api
 // Versions will change when a breaking change is required (Adding fields is not a breaking change)
 window.addEventListener("message", async (e) => {
+  if (!globalChatEnabled) return;
   if (!Object.values(GC_DOMAINS).includes(e.origin)) {
     console.warn(
       "Got a message but it was not from one of the global chat domains."

@@ -5922,7 +5922,7 @@ Is it scaring you off?`,
               goButton.checked = settings.topNav.buttons.GO;
             }
           }
-          if (!liteMode) {
+          if (!liteMode && globalChatEnabled) {
             const globalChatButton = document.getElementById(
               "settings-page-global-chat-button"
             );
@@ -6040,7 +6040,7 @@ Is it scaring you off?`,
             "settings-page-settings-keybinding",
             settings.other.keybinds.settings
           );
-          if (!liteMode)
+          if (!liteMode && globalChatEnabled)
             loadKeybind2(
               "settings-page-gc-keybinding",
               settings.other.keybinds.gc
@@ -6135,7 +6135,7 @@ Is it scaring you off?`,
               "settings-page-go-button"
             );
           }
-          if (!liteMode) {
+          if (!liteMode && globalChatEnabled) {
             settings.topNav.buttons.GC = getCheckboxValue(
               "settings-page-global-chat-button"
             );
@@ -6224,7 +6224,7 @@ Is it scaring you off?`,
           settings.other.keybinds.settings = saveKeybind(
             "settings-page-settings-keybinding"
           );
-          if (!liteMode) {
+          if (!liteMode && globalChatEnabled) {
             settings.other.keybinds.gc = saveKeybind(
               "settings-page-gc-keybinding"
             );
@@ -6593,7 +6593,7 @@ Is it scaring you off?`,
               "Choose which buttons you want to see in the top navigation."
             )
           );
-          if (!liteMode) {
+          if (!liteMode && globalChatEnabled) {
             this.settingsPage.appendChild(
               createSettingsButtonWithLabel(
                 "settings-page-global-chat-button",
@@ -6763,7 +6763,7 @@ Is it scaring you off?`,
           this.settingsPage.appendChild(
             createKeybindInput("settings-page-settings-keybinding", "Settings")
           );
-          if (!liteMode) {
+          if (!liteMode && globalChatEnabled) {
             this.settingsPage.appendChild(
               createKeybindInput("settings-page-gc-keybinding", "Global Chat")
             );
@@ -10124,6 +10124,7 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     main: "https://gc.smartschoolplusplus.com",
     beta: "https://gcbeta.smartschoolplusplus.com"
   };
+  var globalChatEnabled = false;
   var GlobalChatWindow = class extends BaseWindow {
     iframe;
     gcContent;
@@ -10145,6 +10146,7 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
   var gcWindow;
   var gcGlass;
   async function openGlobalChat(event, beta = false) {
+    if (!globalChatEnabled) return;
     if (gcWindow?.beta != beta) {
       recreateGlobalChat();
     }
@@ -10174,6 +10176,7 @@ Your version: <b>${data.plantVersion}</b> is not the newest available version`;
     return GlobalChatOpenButton;
   }
   window.addEventListener("message", async (e5) => {
+    if (!globalChatEnabled) return;
     if (!Object.values(GC_DOMAINS).includes(e5.origin)) {
       console.warn(
         "Got a message but it was not from one of the global chat domains."
@@ -15948,7 +15951,7 @@ ${code}`;
     createQuickSettings();
     let pushRight = topNav.childNodes[2];
     if (!pushRight) return;
-    if (!liteMode) {
+    if (!liteMode && globalChatEnabled) {
       topNav.insertBefore(createGC(), pushRight);
     }
     if (onHomePage) {

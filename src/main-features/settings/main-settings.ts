@@ -17,6 +17,7 @@ import { setWidgetSetting, getWidgetSetting } from "../../widgets/widgets.js";
 import { applyWeatherEffects } from "../appearance/weather-effects.js";
 import { clearAllData } from "../../fixes-utils/utils.js";
 import { loadQuickSettings } from "./quick-settings.js";
+import { globalChatEnabled } from "../globalchat.js";
 import { createTextInput, createButton } from "../appearance/ui.js";
 import { applyProfilePicture } from "../profile.js";
 import { ThemeSelector } from "../appearance/themes.js";
@@ -462,7 +463,7 @@ export class SettingsWindow extends BaseWindow {
           }
         }
 
-        if (!liteMode) {
+        if (!liteMode && globalChatEnabled) {
           const globalChatButton = document.getElementById(
             "settings-page-global-chat-button"
           );
@@ -619,7 +620,7 @@ export class SettingsWindow extends BaseWindow {
           "settings-page-settings-keybinding",
           settings.other.keybinds.settings
         );
-        if (!liteMode)
+        if (!liteMode && globalChatEnabled)
           loadKeybind(
             "settings-page-gc-keybinding",
             settings.other.keybinds.gc
@@ -758,7 +759,7 @@ export class SettingsWindow extends BaseWindow {
           );
         }
 
-        if (!liteMode) {
+        if (!liteMode && globalChatEnabled) {
           settings.topNav.buttons.GC = getCheckboxValue(
             "settings-page-global-chat-button"
           );
@@ -876,7 +877,7 @@ export class SettingsWindow extends BaseWindow {
           "settings-page-settings-keybinding"
         );
 
-        if (!liteMode) {
+        if (!liteMode && globalChatEnabled) {
           settings.other.keybinds.gc = saveKeybind(
             "settings-page-gc-keybinding"
           );
@@ -1334,7 +1335,7 @@ export class SettingsWindow extends BaseWindow {
             "Choose which buttons you want to see in the top navigation."
           )
         );
-        if (!liteMode) {
+        if (!liteMode && globalChatEnabled) {
           this.settingsPage.appendChild(
             createSettingsButtonWithLabel(
               "settings-page-global-chat-button",
@@ -1526,7 +1527,7 @@ export class SettingsWindow extends BaseWindow {
           createKeybindInput("settings-page-settings-keybinding", "Settings")
         );
 
-        if (!liteMode) {
+        if (!liteMode && globalChatEnabled) {
           this.settingsPage.appendChild(
             createKeybindInput("settings-page-gc-keybinding", "Global Chat")
           );

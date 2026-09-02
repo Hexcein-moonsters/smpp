@@ -41,7 +41,7 @@ import {
   createWidgetSystem,
   createWidgetEditModeButton,
 } from "../widgets/widgets.js";
-import { createGC, setGlobalGlass } from "./globalchat.js";
+import { createGC, setGlobalGlass, globalChatEnabled } from "./globalchat.js";
 import {
   createQuickSettingsButton,
   createQuickSettings,
@@ -359,7 +359,7 @@ function createTopButtons() {
   let pushRight = topNav.childNodes[2];
   if (!pushRight) return;
 
-  if (!liteMode) {
+  if (!liteMode && globalChatEnabled) {
     topNav.insertBefore(createGC(), pushRight);
   }
   if (onHomePage) {
