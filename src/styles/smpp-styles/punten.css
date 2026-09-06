@@ -31,13 +31,6 @@
   line-height: 1.1;
 }
 
-.punten-overall-message {
-  font-size: 0.9rem;
-  color: var(--color-text);
-  opacity: 0.85;
-  margin-top: 0.25rem;
-}
-
 .punten-groep-titel {
   font-size: 0.85rem;
   font-weight: 700;

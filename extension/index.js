@@ -14887,7 +14887,6 @@ ${code}`;
   registerWidget(new CalendarWidget());
 
   // src/widgets/punten.ts
-  var ONVOLDOENDE_GRENS = 0;
   var VOLDOENDE_GRENS = 50;
   var GOED_BEZIG_GRENS = 70;
   var UITSTEKEND_GRENS = 80;
@@ -14948,13 +14947,6 @@ ${code}`;
       if (waarde >= GOED_BEZIG_GRENS) return "var(--color-accent)";
       if (waarde >= VOLDOENDE_GRENS) return "var(--color-orange)";
       return "var(--color-red)";
-    }
-    boodschapVoorGemiddelde(waarde) {
-      if (waarde >= UITSTEKEND_GRENS) return "Uitstekend bezig! \u{1F389}";
-      if (waarde >= GOED_BEZIG_GRENS) return "Goed bezig, blijf zo verdergaan!";
-      if (waarde >= VOLDOENDE_GRENS) return "Het kan beter, blijf oefenen.";
-      if (waarde >= ONVOLDOENDE_GRENS) return "Dit is een buis kom op niet opgeven";
-      return "Het is tijd om hulp te vragen en te verbeteren.";
     }
     async createContent() {
       const container = document.createElement("div");
@@ -15019,10 +15011,6 @@ ${code}`;
           overallValue.style.color = this.kleurVoorWaarde(overallAverage);
         }
         overallDiv.appendChild(overallValue);
-        const overallMessage = document.createElement("div");
-        overallMessage.classList.add("punten-overall-message");
-        overallMessage.innerText = this.boodschapVoorGemiddelde(overallAverage);
-        overallDiv.appendChild(overallMessage);
         body.appendChild(overallDiv);
         const groepen = [
           {

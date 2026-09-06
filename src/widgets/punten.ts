@@ -96,14 +96,6 @@ class PuntenWidget extends WidgetBase {
     return "var(--color-red)";
   }
 
-  boodschapVoorGemiddelde(waarde: number): string {
-    if (waarde >= UITSTEKEND_GRENS) return "Uitstekend bezig! 🎉";
-    if (waarde >= GOED_BEZIG_GRENS) return "Goed bezig, blijf zo verdergaan!";
-    if (waarde >= VOLDOENDE_GRENS) return "Het kan beter, blijf oefenen.";
-    if (waarde >= ONVOLDOENDE_GRENS) return "Dit is een buis kom op niet opgeven";
-    return "Het is tijd om hulp te vragen en te verbeteren.";
-  }
-
   override async createContent() {
     const container = document.createElement("div");
     container.classList.add("punten-widget");
@@ -144,7 +136,11 @@ class PuntenWidget extends WidgetBase {
     bar.style.width = `${clampedWidth}%`;
     if (!monochrome) {
       const barKleur =
-        vak.average >= GOED_BEZIG_GRENS ? "#5cc951" : vak.average >= VOLDOENDE_GRENS ? "#ffd353" : "#e14448";
+        vak.average >= GOED_BEZIG_GRENS
+          ? "#5cc951"
+          : vak.average >= VOLDOENDE_GRENS
+            ? "#ffd353"
+            : "#e14448";
       bar.style.setProperty("background-color", barKleur, "important");
     }
     barContainer.appendChild(bar);
@@ -187,11 +183,6 @@ class PuntenWidget extends WidgetBase {
           overallValue.style.color = this.kleurVoorWaarde(overallAverage);
         }
         overallDiv.appendChild(overallValue);
-
-        const overallMessage = document.createElement("div");
-        overallMessage.classList.add("punten-overall-message");
-        overallMessage.innerText = this.boodschapVoorGemiddelde(overallAverage);
-        overallDiv.appendChild(overallMessage);
 
         body.appendChild(overallDiv);
 
