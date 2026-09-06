@@ -15057,9 +15057,9 @@ ${code}`;
       title.classList.add("punten-preview-title");
       title.innerText = "Punten";
       previewContainer.appendChild(title);
-      const image = document.createElement("img");
-      image.src = getExtensionImage("icons/widgets/punten_490x626.png");
-      image.classList.add("punten-preview-image");
+      const image = document.createElement("div");
+      image.classList.add("results-icon-128");
+      image.style.marginTop = "1rem";
       previewContainer.appendChild(image);
       return previewContainer;
     }

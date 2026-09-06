@@ -2569,6 +2569,16 @@ body.modern-ui .homepage__block__content {
   background-repeat: no-repeat;
   background-position: center;
 }
+
+.results-icon-128{
+  background-image: url(https://static4.smart-school.net/smsc/svg/results_donut/results_donut_24x24.svg) !important;
+  background-size: 128px 128px;
+  min-height: 128px;
+  min-width: 128px;
+  background-repeat: no-repeat;
+  background-position: center;
+}
+
 .infoBlock .infoBlock_content .infoBlock_planner,
 .infoBlock_lvsitem,
 .infoBlock_message,
