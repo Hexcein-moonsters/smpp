@@ -199,21 +199,16 @@ span.login-app__title.login-app__title--sign-in-with {
 
 .splashtextcontainer {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  transform-origin: left !important;
-  transform: translateX(180px) translateY(-240px) rotate(20deg) !important;
-  /* Moves right by 200px and rotates */
+  right: 1rem;
+  top: -0.5rem;
+  transform: translateX(50%) rotate(25deg) !important;
   text-align: center;
   z-index: 99999;
 }
 
 .splashtext {
   color: var(--color-splashtext) !important;
-  font-size: 30px !important;
-  left: -20% !important;
-  max-width: 60% !important;
-  word-break: keep-all !important;
+  font-size: 2rem !important;
   position: relative !important;
 }
 
@@ -240,4 +235,16 @@ span.login-app__title.login-app__title--sign-in-with {
   justify-self: center !important;
   border-radius: 10px !important;
   margin: 0px !important;
+}
+
+.login-app__password .form__eye-icon {
+  top: 1.55rem !important;
+}
+
+#smscMain.showLeftNav:has(.login-app) {
+  align-items: center !important;
+}
+
+.showLeftNav {
+  background-color: transparent !important;
 }
